@@ -1,0 +1,12 @@
+# Google Colab での実行かを調べる
+import sys
+import os
+ENV_COLAB = True  if 'google.colab' in sys.modules else False
+
+# google drive のマウント
+if ENV_COLAB:
+  from google.colab import drive
+  drive.mount('/content/drive')
+  my_note_path = '/content/drive/MyDrive/Colab Notebooks/配布ノートブック/DNN_code_colab_day1/notebook'
+  os.chdir('/')
+  os.chdir(my_note_path)

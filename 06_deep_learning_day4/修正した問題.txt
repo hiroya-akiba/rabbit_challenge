@@ -1,0 +1,28 @@
+正解数 72問
+修正した問題 13問
+6  (罹患率) OK 1
+24 (Pooling後の解像度) OK 4
+28 (マイバック持参の平均情報量) OK 2
+33 (modified n-gram precisionの計算方法) OK 3
+34 (BLEUが対数加重平均を取る理由) OK 1
+46 (IoUの定義) OK 1
+55 (GANのDにおけるGの損失関数) OK 4
+56 (GANのGとDのtrain関数引数) OK 4
+59 (GANのGとDの関係) ?? 2
+70 (ResNetとWideResNetの比較→ResNetとWRNでRBのフィルタ数は同じ) OK 1
+71 (WideResNetの転移学習) OK 2
+75 (WideResNetのエラー率) OK 2
+86 (サンプリング周波数とサンプル窓長) OK 2
+
+→ 正解数 81問
+
+少しでも間違えている可能性のある問題
+7  (COCOではBB位置の精度を重視した指標を用いるか) OK 2
+35 (Ridge回帰の正則化係数)
+36 (Lasso回帰の正則化係数)
+39 (過学習・未学習) OK 1
+53 (Unpooling) OK
+57 (DCGANの活性化関数 tanh) OK 3
+64 (MNISTデータセットのデータ拡張) OK
+69 (BatchNormalizationを適用するタイミング)
+73 (残差ブロックの説明)

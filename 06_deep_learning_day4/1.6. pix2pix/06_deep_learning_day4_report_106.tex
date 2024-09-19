@@ -1,0 +1,46 @@
+\documentclass{ltjsarticle}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{tabularx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{fancybox}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usetikzlibrary{shapes,arrows}
+
+\begin{document}
+
+\title{106. 深層学習の適用方法(スタイル変換)}
+\author{秋葉洋哉}
+\maketitle
+
+\section{Pix2pix}
+\subsection{概要}
+Pix2pixは、画像変換のためのモデルであり、画像のペアを入力として、画像の変換を行う。画像のペアとは、入力画像と出力画像の組み合わせであり、例えば、セグメンテーションマップと写真、白黒画像とカラー画像などがある。Pix2pixは、CGAN(Conditional Generative Adversarial Networks)を用いて学習を行う。
+\par
+CGANとは、あるクラスを与えた際に、そのクラスに対応する画像を生成するGANである。Pix2pixは、その条件の変わりに画像を与えることで、何らかの変換を施した画像を出力するモデルである。
+Pix2pixではこの画像の変換方法を学習していく。
+\par
+各プレイヤーの役割は以下の通りである。
+\begin{itemize}
+  \item Generator : 条件画像xを基にある画像G(x,y)を生成する
+  \item Discriminator : 条件画像xをG(x,y)に変換したものと、条件画像xに真の変換が施された画像yを見分ける
+\end{itemize}
+\par
+例えば、条件画像xに白黒の画像に対して、真の変換後画像yに着色した画像を与えたり、条件画像xに航空写真の画像を与えて、真の変換後画像yに道だけを抽出した画像を与えることで、学習を行う。
+
+\subsection{CGANからの工夫1: U-Net}
+Pix2pixは、GeneratorにU-Netを用いている。U-Netは、セマンティックセグメンテーションにおいて、ピクセル単位でクラス分類するネットワークである。U-Netは、Encoder-Decoder構造を持ち、Encoderでは画像の特徴を抽出し、Decoderでは同じ階層のEncoderの特徴マップを元に画像を生成する。この構造により、画像の特徴を保持しつつ、画像を生成することができる。
+\par
+Pix2pixは、U-Netの画像の位置関係を保持する構造を用いることで、元画像の特徴を保持しつつ、変換を行うことができる。
+
+\subsection{CGANからの工夫2: L1正則化項の追加}
+Pix2pixは、Generatorの損失関数にL1正則化項を追加している。通常のGANと異なり、Pix2pixでは画像の変換方法を学習するため、条件画像と生成画像に視覚的一致性があることが重要である。このため、画像の高周波成分(色の変化が顕著な部分)を学習し、Generatorが生成した画像がぼやけることを防ぐため、L1正則化項を追加している。
+
+\subsection{CGANからの工夫3: PatchGAN}
+Pix2pixは、DiscriminatorにPatchGANを用いている。PatchGANは、画像全体ではなく、画像の一部分(パッチ)に対して識別を行うGANである。この手法を用いて、各パッチ毎にPix2pixを適用させることで、高周波成分を残す効果を高めることができる。
+
+\newpage
+\end{document}

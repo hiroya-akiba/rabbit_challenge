@@ -1,0 +1,79 @@
+\documentclass{ltjsarticle}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{tabularx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{fancybox}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usetikzlibrary{shapes,arrows}
+
+\begin{document}
+
+\title{200. 深層強化学習}
+\author{秋葉洋哉}
+\maketitle
+
+\section{A3C}
+\subsection{概要}
+A3C(Asynchronuous Advantage Actor-Critic)とは、強化学習の学習方法の一つで、複数のエージェントが同一の環境で非同期に学習するという特徴を有している。
+名前の由来は
+\begin{itemize}
+  \item Asynchronous : 複数エージェントが非同期で並列学習する、という意
+  \item Advantage : 複数ステップ先を考慮して更新する、という意
+  \item Actor : 方策によって行動を選択する、という意
+  \item Critic : 状態価値関数を用いて方策を修正する、という意
+\end{itemize}
+Actor-Criticとは、方策(Actor)を直接改善しながら、方策を評価する価値関数(Critic)を同時に学習させるアプローチを指している。
+
+\subsection{アルゴリズム}
+A3Cのアルゴリズムは、以下の通りである。
+\begin{enumerate}
+  \item グローバルネットワークを初期化する
+  \item エージェントごとにローカルネットワークを初期化する
+  \item エージェントごとに以下の手順を繰り返す
+  \begin{enumerate}
+    \item グローバルネットワークの重みをローカルネットワーク(Worker $n$)にpopする
+    \item 環境($E_n$)から状態($s^t_n$)を取得する
+    \item 状態($s^t_n$)を入力として、ローカルネットワークから方策($\pi_n$)と価値($V_n$)を取得する
+    \item 方策($\pi_n$)に基づいて行動を選択し、環境($E_n$)に適用する
+    \item 環境から報酬と次の状態($s^{(t+1)}_n$)を取得する
+    \item 状態($s^t_n$)と次の状態($s^{(t+1)}_n$)を入力として、ローカルネットワークから方策と価値を取得する
+    \item 方策と価値を用いて、方策勾配と価値勾配を計算する
+    \item 方策勾配と価値勾配を用いて、ローカルネットワークの重みを更新する
+    \item ローカルネットワークの重みをグローバルネットワークにpushする
+  \end{enumerate}
+\end{enumerate}
+
+一般的なActor-Criticネットワークでは、方策ネットワークと価値ネットワークを別々に定義し、別々の損失関数(方策勾配ロス/価値ロス)でネットワークを更新していた。
+しかし、A3Cでは、パラメータ共有型のActor-Criticであり、1つの分岐型のネットワークが、方策と価値の両方を出力し、一つの「トータルロス関数」を用いてネットワークを更新する。これにより、方策勾配と価値勾配を同時に学習することができる。
+トータルロス関数は、以下で表せる。
+\begin{align}
+  \text{Total Loss} = - \text{アドバンテージ方策勾配} + \alpha \cdot \text{価値関数ロス} - \beta \cdot \text{方策エントロピー}
+\end{align}
+ここで、アドバンテージ方策勾配は、方策勾配にアドバンテージを掛けたものであり、アドバンテージは、報酬と価値の差分である。また、方策エントロピーは、方策の多様性を保つための項である。
+
+
+\subsection{A3Cのメリット}
+A3Cのメリットは、以下の通りである。
+\begin{itemize}
+  \item 複数エージェントが同時に学習するため、学習速度が速い
+  \item 方策勾配と価値勾配を同時に学習するため、学習が安定する
+\end{itemize}
+2. については、強化学習長年の課題であった、経験の自己相関が引き起こす学習の不安定化を解消することができる、というメリットになる。この課題に対しては、かつては、DQN(Deep Q-Networkの略、Q学習を用いた強化学習手法)が、Experience Replay(経験再生)という手法を用いることで解決していた。Experience Replayは、バッファに蓄積した経験をランダムに取り出すことで、経験の自己相関を低減する手法である。しかし、経験再生は基本的にはオフポリシー手法(方策とは異なる方策で学習する手法)であるため、オンポリシー手法(方策と同じ方策で学習する手法)であるA3Cとは相性が悪い。そのため、A3Cは、経験再生を用いずに、サンプルを集めるエージェントを並列化することで、経験の自己相関を低減する手法を採用している。
+
+\subsection{A3Cの課題}
+A3Cでは、Python言語の特性上、非同期並列処理を行うのが面倒であったり、大規模なリソースが必要になるという課題がある。そのため、A3Cの改良版として、A2Cという手法が発表された。A2Cは、A3Cの非同期処理を同期処理に変更することで、性能を大きく変えずに学習の安定化と計算リソースの削減を実現している。
+
+
+\clearpage
+\paragraph{参考文献}
+\begin{enumerate}
+  \item 岡谷貴之/深層学習 改訂第2版 [機械学習プロフェッショナルシリーズ]/ 講談社サイエンティフィク/ 2022-01-17
+  \item \url{https://arxiv.org/abs/1602.01783}
+\end{enumerate}
+
+\newpage
+\end{document}

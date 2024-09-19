@@ -1,0 +1,13 @@
+numpy==1.19.5
+matplotlib==3.2.2
+tensorflow==2.7.0
+pandas==1.1.5
+seaborn==0.11.2
+tensorflow-datasets==4.0.1
+scikit-learn==1.0.2
+torch==1.10.0 
+jupyter
+tensorflow-hub==0.12.0
+opencv-python==4.1.2.30
+Pillow==7.1.2
+tensorboard==2.8.0
